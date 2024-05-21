@@ -1,4 +1,1 @@
-{
-"name": "@libmapper/libmapper.js",
-"version": "0.0.1"
-}
+{"name":"@peacheym/libmapper.js","version":"0.0.1","dependencies":{"@peacheym/libmapper.js":"^0.0.1"}}

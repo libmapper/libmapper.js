@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Experiment with libmapper on the web</title>
+  </head>
+  <body>
+    <h1>libmapper on the web</h1>
+    <p>Try adjusting the slider below</p>
+    <!-- <p>The value is: <span id="value"></span></p> -->
+    <input id="inputSlider" type="range" min="10" , max="90" />
+
+    <script type="module">
+      import { LibmapperDevice, LibmapperSignal } from "./libmapper.js";
+
+      let WEBSOCKET_URL = "ws://0.0.0.0:5000/echo";
+
+      let libmapperDev = new LibmapperDevice("browserDevice", WEBSOCKET_URL);
+
+      let mySlider = document.getElementById("inputSlider");
+      libmapperDev.addSignal(mySlider); // Add libmapper signal that is bound to an html element
+    </script>
+  </body>
+</html>

@@ -13,15 +13,64 @@ class LibmapperSignal {
 }
 
 class LibmapperDevice {
-  constructor(name, wsUrl) {
+  constructor(name) {
+    this.wsUrl = "ws://localhost:5001/ws"
     this.name = name;
     this.signals = [];
-
-    this.ws = new WebSocket(wsUrl);
+    this.deviceId = -1;
+    this.sessionId = -1;
+    this.signalId = -1;
+    this.ws = new WebSocket(this.wsUrl);
 
     this.ws.onopen = (event) => {
-      this.ws.send("[libmapper] websocket connection is open");
+      // this.ws.send("[libmapper] websocket connection is open");
     };
+
+    this.ws.onmessage = async (msg) => {
+      var m = JSON.parse(msg.data);
+      console.log(m);
+      if (m.Op == 3) {
+        this.sessionId = m.Data;
+        // document.getElementById("session").innerText = m.Data;
+        // create device
+        await fetch("http://localhost:5001/devices", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Session-ID": this.sessionId.toString(),
+          },
+          body: JSON.stringify({
+            name: "SliderMapper",
+          }),
+        })
+          .then((res) => res.json())
+          .then((data) => {
+            console.log("Created device ", data.device_id);
+            this.deviceId = data.device_id;
+            // document.getElementById("device").innerText = data.device_id;
+          });
+        // create signal
+        await fetch(`http://localhost:5001/devices/${this.deviceId}/signals`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Session-ID": this.sessionId.toString(),
+          },
+          body: JSON.stringify({
+            direction: 2, // output
+            name: "Slider",
+          }),
+        })
+          .then((res) => res.json())
+          .then((data) => {
+            console.log("Created signal ", data.signal_id);
+            this.signalId = data.signal_id;
+            // document.getElementById("signal").innerText = data.signal_id;
+          });
+      }
+    };
+    let _self = this
+    setTimeout(() => _self.ws.send(JSON.stringify({ op: 0 })), 1000);
   }
 
   printSignals() {
@@ -58,7 +107,17 @@ class LibmapperDevice {
     var _self = this; // Javascript wonkyness..
 
     element.addEventListener("input", (event) => {
-      _self.ws.send(event.target.value);
+      // _self.ws.send(event.target.value);
+
+      _self.ws.send(
+        JSON.stringify({
+          op: 2,
+          data: {
+            SignalId: _self.signalId,
+            Value: parseFloat(event.target.value),
+          },
+        })
+      );
     });
 
     // Initialize a signal, push to device list of signals and return

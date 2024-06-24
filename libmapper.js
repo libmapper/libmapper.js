@@ -46,7 +46,7 @@ class LibmapperSignal {
           max: max,
           type: 2,
           vector_length: 1,
-          units: "slider steps",
+          units: "steps",
         }),
       })
         .then((res) => res.json())
@@ -102,24 +102,11 @@ class LibmapperDevice {
         console.log(msg.data);
         if ((recv.op = 3)) resolve({ data: recv.data, webSocket: ws });
       };
-    }).then((result_outer) => {
-      return new Promise(async (resolve, result) => {
-        let id = await LibmapperDevice._makeDevice(result_outer.data, name);
+    }).then(async (result) => {
+      let id = await LibmapperDevice._makeDevice(result.data, name);
 
-        resolve(
-          new LibmapperDevice(
-            result_outer.webSocket,
-            result_outer.data,
-            id,
-            name
-          )
-        );
-      });
+      return new LibmapperDevice(result.webSocket, result.data, id, name);
     });
-  }
-
-  getSignals() {
-    return this.signals;
   }
 
   isValidElement(element) {
@@ -133,16 +120,6 @@ class LibmapperDevice {
   }
 
   async addSignal(element) {
-    // Debugging Statement
-    console.log(
-      element.id,
-      element.nodeName,
-      element.type,
-      element.min,
-      element.max,
-      element.value
-    );
-
     // Get the signal ID we need asynchronously
     let signalId = await LibmapperSignal._createSignal(
       element.id,

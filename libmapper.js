@@ -5,22 +5,26 @@
  */
 
 class LibmapperSignal {
-  constructor(parentDev, element, signalId) {
+  constructor(parentDev, element, signalId, direction) {
     this.name = element.id;
     this.signalId = signalId;
 
-    let _self = this;
-    element.addEventListener("input", (event) => {
-      parentDev.ws.send(
-        JSON.stringify({
-          op: 2,
-          data: {
-            SignalId: _self.signalId,
-            Value: parseFloat(event.target.value),
-          },
-        })
-      );
-    });
+    if (direction == 2) {
+      // Outgoing signal
+      let _self = this;
+      element.addEventListener("input", (event) => {
+        console.log(event.target.value);
+        parentDev.ws.send(
+          JSON.stringify({
+            op: 2,
+            data: {
+              signal_id: _self.signalId,
+              value: [parseFloat(event.target.value)],
+            },
+          })
+        );
+      });
+    }
 
     console.log(
       "Created new Signal with name: " + this.name + " and ID:" + this.signalId
@@ -40,17 +44,18 @@ class LibmapperSignal {
 
         // TODO: Confirm with backend API the correct way to call it & fix any bugs.
         body: JSON.stringify({
-          direction: 2, // output
-          name: signalName,
+          direction: 2,
+          name: "Slider",
           min: min,
           max: max,
-          type: 2,
+          units: "Blorbs",
           vector_length: 1,
-          units: "steps",
+          type: 102,
         }),
       })
         .then((res) => res.json())
         .then((data) => {
+          console.log("Creating Sig");
           console.log(data);
           resolve(data.signal_id);
         });
@@ -66,6 +71,10 @@ class LibmapperDevice {
     this.deviceId = deviceId;
     // Defined
     this.signals = [];
+
+    this.ws.onmessage = (msg) => {
+      console.log(msg.data);
+    };
   }
 
   static async _makeDevice(sessionId, name) {
@@ -130,7 +139,7 @@ class LibmapperDevice {
     );
 
     // Instantiate a new signal with relevant data
-    let newSignal = new LibmapperSignal(this, element, signalId);
+    let newSignal = new LibmapperSignal(this, element, signalId, 2); // direction=2 is hardcoded for now. Refactor to not do that.
     this.signals.push(newSignal);
     return newSignal;
   }

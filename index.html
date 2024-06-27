@@ -9,6 +9,8 @@
     <!-- <p>The value is: <span id="value"></span></p> -->
     <input id="libmapperSlider" type="range" min="0" , max="100" />
 
+    <p>Input Value: <span id="inputSigVal">0</span></p>
+
     <script type="module">
       import { LibmapperDevice, LibmapperSignal } from "./libmapper.js";
 
@@ -16,7 +18,13 @@
       let mySlider = document.getElementById("libmapperSlider");
 
       let libmapperDev = await LibmapperDevice.create("browserDev");
-      let mySig = await libmapperDev.addSignal(mySlider);
+      let mySig = await libmapperDev.addSignal(mySlider, "OUTGOING");
+
+      let span = document.getElementById("inputSigVal");
+      let myIncomingSig = await libmapperDev.addSignal(span, "INCOMING");
+
+      console.log(libmapperDev.signals)
+
     </script>
   </body>
 </html>

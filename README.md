@@ -4,7 +4,11 @@ Libmapper in the browser via websockets.
 
 ## Overview
 
-The libmapper project currently supports a rich eco-system of custom input-controllers, bindings for commodity hardware, software inputs, synthesizers, game-engines, and other multimedia systems. With recent advances in web-technology, many creative folks are turning to the many options frontend frameworks avaliable on the web when implementing their own GUIs and projects. Because of both of these factors, supporting libmapper connectivity in the browser will provide interesting new methods for interacting with web-based multimedia components.
+The libmapper project currently supports a rich eco-system of custom input-controllers, bindings for commodity hardware, software inputs, synthesizers, game-engines, and other multimedia systems. With recent advances in web-technology, many creative folks are turning to the many options frontend frameworks avaliable on the web when implementing their own GUIs and projects. Because of both of these factors, supporting libmapper connectivity in the browser will provide interesting new methods for interacting with web-based multimedia components. The issue however is that while libmapper requires TCP communication in order to maintain networking requirements, modern browsers operate in a "sandbox" which inherently restricts such communication protocols.
+
+To fix this, we propose a web-socket based solution. Where a daemon is running in the background of your local machine and is responsible for creating and maintaining connections to the libmapper network. This daemon is [avaliable here](https://github.com/EggAllocationService/mapperd) and once cloned can be ran using the command `dotnet run` from within the `/mapperd` directory.
+
+_Note: Full instructions for Daemon usage are avaliable in it's git repository._
 
 ## API Usage
 

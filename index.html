@@ -6,8 +6,14 @@
   <body>
     <h1>libmapper on the web</h1>
     <p>Try adjusting the slider below</p>
-    <!-- <p>The value is: <span id="value"></span></p> -->
-    <input id="libmapperSlider" type="range" min="10" , max="90" />
+    <hr />
+    <div>
+      <p>Outgoing Signal Value:</p>
+      <input id="libmapperSlider" type="range" min="0" , max="100" />
+    </div>
+    <hr />
+    <p>Input Signal Value: <span id="inputSigVal">0</span></p>
+    <hr />
 
     <script type="module">
       import { LibmapperDevice, LibmapperSignal } from "./libmapper.js";
@@ -15,8 +21,13 @@
       // HTML Element that we will bind a libmapper signal to
       let mySlider = document.getElementById("libmapperSlider");
 
+      // Init an outgoing signal
       let libmapperDev = await LibmapperDevice.create("browserDev");
-      let mySig = await libmapperDev.addSignal(mySlider);
+      let mySig = await libmapperDev.addSignal(mySlider, "OUTGOING");
+
+      // Init an incoming signal
+      let span = document.getElementById("inputSigVal");
+      let myIncomingSig = await libmapperDev.addSignal(span, "INCOMING");
     </script>
   </body>
 </html>

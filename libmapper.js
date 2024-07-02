@@ -5,31 +5,54 @@
  */
 
 class LibmapperSignal {
-  constructor(parentDev, element, signalId) {
+  constructor(parentDev, element, signalId, direction) {
+    this.element = element;
     this.name = element.id;
     this.signalId = signalId;
+    this.direction = direction;
 
     let _self = this;
-    element.addEventListener("input", (event) => {
-      parentDev.ws.send(
-        JSON.stringify({
-          op: 2,
-          data: {
-            SignalId: _self.signalId,
-            Value: parseFloat(event.target.value),
-          },
-        })
-      );
-    });
+    // TODO: Consider moving this if/else block into it's own setup function for cleaner code.
+    if (direction == 1) {
+      // Incoming Signal
+      parentDev.ws.addEventListener("message", (msg) => {
+        var recv = JSON.parse(msg.data);
+        _self.element.value = recv.data.value;
 
+        // Call the oninput event handler with the received value as if the user had adjusted the element directly.
+        // TODO: Determine how to handle this dynamically for other elements
+        element.dispatchEvent(new Event("input", { value: recv.data.value }));
+      });
+    } else if (direction == 2) {
+      // Outgoing Signal
+      element.addEventListener("input", (event) => {
+        console.log("OUTGOING: " + event.target.value);
+        parentDev.ws.send(
+          JSON.stringify({
+            op: 2,
+            data: {
+              signal_id: _self.signalId,
+              value: parseFloat(event.target.value),
+            },
+          })
+        );
+      });
+    }
+
+    // TODO: Debug Statement
     console.log(
       "Created new Signal with name: " + this.name + " and ID:" + this.signalId
     );
-
-    // Todo: Emit message to ws server to initialize a signal.
   }
 
-  static async _createSignal(signalName, min, max, deviceId, sessionId) {
+  static async _createSignal(
+    signalName,
+    min,
+    max,
+    deviceId,
+    sessionId,
+    direction
+  ) {
     return new Promise((resolve, result) => {
       fetch(`http://localhost:5001/devices/${deviceId}/signals`, {
         method: "POST",
@@ -38,20 +61,21 @@ class LibmapperSignal {
           "Session-ID": sessionId.toString(),
         },
 
-        // TODO: Confirm with backend API the correct way to call it & fix any bugs.
         body: JSON.stringify({
-          direction: 2, // output
+          direction: direction,
           name: signalName,
-          min: min,
-          max: max,
-          type: 2,
+          min: parseFloat(min),
+          max: parseFloat(max),
+          units: "tbd", // TODO: decide how we want the user (if at all) to specify units.
           vector_length: 1,
-          units: "steps",
+          type: 102, // Todo: Do we need a type enum? Why do we need a type?
         }),
       })
         .then((res) => res.json())
         .then((data) => {
-          console.log(data);
+          // Todo: remove debug line
+          // console.log("Creating Sig");
+          // console.log(data);
           resolve(data.signal_id);
         });
     });
@@ -60,12 +84,18 @@ class LibmapperSignal {
 
 class LibmapperDevice {
   constructor(ws, sessionId, deviceId, name) {
+    this.MAPPER_DIR = { OUTGOING: 2, INCOMING: 1 };
+
     this.ws = ws;
     this.name = name;
     this.sessionId = sessionId;
     this.deviceId = deviceId;
-    // Defined
+
     this.signals = [];
+
+    // this.ws.onmessage = (msg) => {
+    //   console.log(msg.data);
+    // };
   }
 
   static async _makeDevice(sessionId, name) {
@@ -78,7 +108,7 @@ class LibmapperDevice {
         "Session-ID": sessionId.toString(),
       },
       body: JSON.stringify({
-        name: this.name,
+        name: name,
       }),
     })
       .then((res) => res.json())
@@ -100,7 +130,7 @@ class LibmapperDevice {
       ws.onmessage = (msg) => {
         var recv = JSON.parse(msg.data);
         console.log(msg.data);
-        if ((recv.op = 3)) resolve({ data: recv.data, webSocket: ws });
+        if (recv.op == 3) resolve({ data: recv.data, webSocket: ws });
       };
     }).then(async (result) => {
       let id = await LibmapperDevice._makeDevice(result.data, name);
@@ -119,18 +149,41 @@ class LibmapperDevice {
     }
   }
 
-  async addSignal(element) {
+  getRange(element) {
+    /**
+     * Helper function to decide what signal ranges an element should get.
+     * todo: Determine if there should be different default values
+     *
+     */
+    let min = 0;
+    let max = 0;
+    if (element.min) {
+      min = element.min;
+    }
+    if (element.max) {
+      max = element.max;
+    }
+
+    return { min: min, max: max };
+  }
+
+  async addSignal(element, signal_direction) {
     // Get the signal ID we need asynchronously
+
+    let direction = this.MAPPER_DIR[signal_direction];
+    let range = this.getRange(element);
+
     let signalId = await LibmapperSignal._createSignal(
       element.id,
-      element.min,
-      element.max,
+      range.min,
+      range.max,
       this.deviceId,
-      this.sessionId
+      this.sessionId,
+      direction
     );
 
     // Instantiate a new signal with relevant data
-    let newSignal = new LibmapperSignal(this, element, signalId);
+    let newSignal = new LibmapperSignal(this, element, signalId, direction);
     this.signals.push(newSignal);
     return newSignal;
   }

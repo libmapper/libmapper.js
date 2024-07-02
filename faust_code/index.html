@@ -1,0 +1,46 @@
+<button id="start">Start</button>
+<button id="gate">Gate</button>
+<input id="pitch" type="range" min="110" max="440" />
+<script type="module">
+  import { LibmapperDevice, LibmapperSignal } from "./../libmapper.js";
+  import "./oscillator.js";
+  const nodeName = "oscillator";
+  const assetPath = ".";
+  const ctx = new AudioContext();
+  const factory = new window[nodeName](ctx, assetPath);
+
+  let gate = 0;
+
+  let libmapperDev = await LibmapperDevice.create("browserDev");
+
+  document.getElementById("start").onclick = async (e) => {
+    e.target.disabled = true;
+    ctx.resume();
+    const node = await factory.load();
+    node.connect(ctx.destination);
+
+    // Build GUI -- this is typically USER defined code.
+    buildGUI(node);
+
+    // attach a libmapper signal to the HTML element
+    libmapperDev.addSignal(document.getElementById("pitch"), "INCOMING");
+  };
+
+  function buildGUI(node) {
+    // This function is user code that binds HTML elements to a FAUST synth.
+    document.getElementById("gate").onclick = (event) => {
+      node.setParamValue("/Oscillator/Gate", toggleGate());
+    };
+
+    document.getElementById("pitch").oninput = (event) => {
+      // node.setParamValue("/Oscillator/freq", event.target.value);
+      node.setOscillatorFreq(event.target.value);
+    };
+  }
+
+  function toggleGate() {
+    gate = !gate;
+    let value = gate ? 1 : 0;
+    return value;
+  }
+</script>

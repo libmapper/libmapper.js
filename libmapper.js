@@ -6,27 +6,33 @@
 
 class LibmapperSignal {
   constructor(parentDev, element, signalId, direction) {
+    this.element = element;
     this.name = element.id;
     this.signalId = signalId;
     this.direction = direction;
 
+    let _self = this;
     // TODO: Consider moving this if/else block into it's own setup function for cleaner code.
     if (direction == 1) {
       // Incoming Signal
       parentDev.ws.addEventListener("message", (msg) => {
-        console.log("INCOMING SIGNAL: " + msg.data.value);
+        var recv = JSON.parse(msg.data);
+        _self.element.value = recv.data.value;
+
+        // Call the oninput event handler with the received value as if the user had adjusted the element directly.
+        // TODO: Determine how to handle this dynamically for other elements
+        element.dispatchEvent(new Event("input", { value: recv.data.value }));
       });
     } else if (direction == 2) {
       // Outgoing Signal
-      let _self = this;
       element.addEventListener("input", (event) => {
-        console.log(event.target.value);
+        console.log("OUTGOING: " + event.target.value);
         parentDev.ws.send(
           JSON.stringify({
             op: 2,
             data: {
               signal_id: _self.signalId,
-              value: [parseFloat(event.target.value)],
+              value: parseFloat(event.target.value),
             },
           })
         );
@@ -58,8 +64,8 @@ class LibmapperSignal {
         body: JSON.stringify({
           direction: direction,
           name: signalName,
-          min: min,
-          max: max,
+          min: parseFloat(min),
+          max: parseFloat(max),
           units: "tbd", // TODO: decide how we want the user (if at all) to specify units.
           vector_length: 1,
           type: 102, // Todo: Do we need a type enum? Why do we need a type?

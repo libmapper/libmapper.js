@@ -51,7 +51,8 @@ class LibmapperSignal {
     max,
     deviceId,
     sessionId,
-    direction
+    direction,
+    units = "tbd"
   ) {
     return new Promise((resolve, result) => {
       fetch(`http://localhost:5001/devices/${deviceId}/signals`, {
@@ -66,7 +67,7 @@ class LibmapperSignal {
           name: signalName,
           min: parseFloat(min),
           max: parseFloat(max),
-          units: "tbd", // TODO: decide how we want the user (if at all) to specify units.
+          units: units, // TODO: decide how we want the user (if at all) to specify units.
           vector_length: 1,
           type: 102, // Todo: Do we need a type enum? Why do we need a type?
         }),
@@ -179,7 +180,8 @@ class LibmapperDevice {
       range.max,
       this.deviceId,
       this.sessionId,
-      direction
+      direction,
+      element.getProperty("mpr-signal-unit") || null
     );
 
     // Instantiate a new signal with relevant data

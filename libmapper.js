@@ -150,6 +150,11 @@ class LibmapperDevice {
     }
   }
 
+  /**
+   * 
+   * @param {HTMLElement} element 
+   * @returns 
+   */
   getRange(element) {
     /**
      * Helper function to decide what signal ranges an element should get.
@@ -163,6 +168,13 @@ class LibmapperDevice {
     }
     if (element.max) {
       max = element.max;
+    }
+
+    if (element.hasAttribute("mpr-signal-min")) {
+      min = parseFloat(element.getAttribute("mpr-signal-min"));
+    }
+    if (element.hasAttribute("mpr-signal-max")) {
+      max = parseFloat(element.getAttribute("mpr-signal-max"));
     }
 
     return { min: min, max: max };

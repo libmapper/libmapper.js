@@ -69,7 +69,7 @@ class LibmapperSignal {
           max: parseFloat(max),
           units: units, // TODO: decide how we want the user (if at all) to specify units.
           vector_length: 1,
-          type: 102, // Todo: Do we need a type enum? Why do we need a type?
+          type: 0, // Todo: Do we need a type enum? Why do we need a type?
         }),
       })
         .then((res) => res.json())

@@ -49,3 +49,7 @@ Note: Both of the examples should be wrapped in a `<script type="module">...</sc
 - [ ] Handle incoming data signals, update the HTML element accordingly
   - [ ] Determine how to handle for arbitrary HTML elements
 - [ ] Write some tests
+
+- [ ] Auto-discovery
+  - [ ] Add default parameter into `LibmapperDevice.create()`.
+  - [ ] Signals with same names are copies of one another when auto-discovered

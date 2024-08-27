@@ -17,7 +17,7 @@ class LibmapperSignal {
       // Incoming Signal
       parentDev.ws.addEventListener("message", (msg) => {
         var recv = JSON.parse(msg.data);
-        _self.element.value = recv.data.value;
+\        _self.element.value = recv.data.value;
 
         // Call the oninput event handler with the received value as if the user had adjusted the element directly.
         // TODO: Determine how to handle this dynamically for other elements
@@ -26,7 +26,6 @@ class LibmapperSignal {
     } else if (direction == 2) {
       // Outgoing Signal
       element.addEventListener("input", (event) => {
-        console.log("OUTGOING: " + event.target.value);
         parentDev.ws.send(
           JSON.stringify({
             op: 2,
@@ -69,7 +68,7 @@ class LibmapperSignal {
           max: parseFloat(max),
           units: units, // TODO: decide how we want the user (if at all) to specify units.
           vector_length: 1,
-          type: 0, // Todo: Do we need a type enum? Why do we need a type?
+          type: 0x00000001, // Todo: Do we need a type enum? Why do we need a type?
         }),
       })
         .then((res) => res.json())
@@ -151,9 +150,9 @@ class LibmapperDevice {
   }
 
   /**
-   * 
-   * @param {HTMLElement} element 
-   * @returns 
+   *
+   * @param {HTMLElement} element
+   * @returns
    */
   getRange(element) {
     /**
@@ -193,7 +192,7 @@ class LibmapperDevice {
       this.deviceId,
       this.sessionId,
       direction,
-      element.getProperty("mpr-signal-unit") || null
+      element.getAttribute("mpr-signal-unit") || null
     );
 
     // Instantiate a new signal with relevant data

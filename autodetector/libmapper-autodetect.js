@@ -1,4 +1,4 @@
-import { LibmapperDevice }  from "../libmapper.js"
+import { LibmapperDevice } from "../libmapper.js";
 /**
  * @type {MutationObserver}
  */
@@ -10,27 +10,27 @@ let observer;
 let device;
 
 function main() {
-  var elements = document.querySelectorAll('[mpr-signal-name]');
+  var elements = document.querySelectorAll("[mpr-signal-name]");
   elements.forEach(registerElement);
 }
 
 /**
- * @param {HTMLElement} element 
+ * @param {HTMLElement} element
  */
 async function registerElement(element) {
-    await device.addSignal(element, getType(element))
+  await device.addSignal(element, getType(element));
 }
 
 /**
- * 
- * @param {HTMLElement} element 
+ *
+ * @param {HTMLElement} element
  * @returns {string}
  */
 function getType(element) {
   if (element instanceof HTMLInputElement && !element.disabled) {
-    return "OUTGOING"
+    return "OUTGOING";
   }
-  return "INCOMING"
+  return "INCOMING";
 }
 
-document.addEventListener('DOMContentLoaded', main);
+document.addEventListener("DOMContentLoaded", main);

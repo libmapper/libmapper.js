@@ -17,7 +17,7 @@ class LibmapperSignal {
       // Incoming Signal
       parentDev.ws.addEventListener("message", (msg) => {
         var recv = JSON.parse(msg.data);
-\        _self.element.value = recv.data.value;
+        _self.element.value = recv.data.value;
 
         // Call the oninput event handler with the received value as if the user had adjusted the element directly.
         // TODO: Determine how to handle this dynamically for other elements

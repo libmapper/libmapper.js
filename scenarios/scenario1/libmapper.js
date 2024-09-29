@@ -1,5 +1,3 @@
-import {autoDiscover} from "./autodetector/libmapper-autodetect.js"
-
 /**
  *
  ** libmapper.js, bringing the libmapper ecosystem to the browser via websockets
@@ -85,7 +83,7 @@ class LibmapperSignal {
 }
 
 class LibmapperDevice {
-  constructor(ws, sessionId, deviceId, name, autoDiscoverFlag) {
+  constructor(ws, sessionId, deviceId, name) {
     this.MAPPER_DIR = { OUTGOING: 2, INCOMING: 1 };
 
     this.ws = ws;
@@ -98,14 +96,6 @@ class LibmapperDevice {
     // this.ws.onmessage = (msg) => {
     //   console.log(msg.data);
     // };
-
-    if (autoDiscoverFlag){
-      autoDiscover(this)
-    }
-    else{
-      window.alert("Womp womp")
-    }
-
   }
 
   static async _makeDevice(sessionId, name) {
@@ -129,9 +119,9 @@ class LibmapperDevice {
     return devID;
   }
 
-  static async create(name, autoDiscoverFlag = true) {
+  static async create(name) {
     return new Promise((resolve, reject) => {
-      let ws = new WebSocket("http://localhost:5001/ws");
+      let ws = new WebSocket("ws://localhost:5001/ws");
 
       ws.onopen = () => {
         ws.send(JSON.stringify({ op: 0 }));
@@ -144,7 +134,8 @@ class LibmapperDevice {
       };
     }).then(async (result) => {
       let id = await LibmapperDevice._makeDevice(result.data, name);
-      return new LibmapperDevice(result.webSocket, result.data, id, name, autoDiscoverFlag);
+
+      return new LibmapperDevice(result.webSocket, result.data, id, name);
     });
   }
 

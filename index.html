@@ -15,6 +15,10 @@
     <p>Input Signal Value: <span id="inputSigVal">0</span></p>
     <hr />
 
+    <input id="libmapperSlider2" type="range" min="0" max="100" mpr-signal-name="CoolSlider" mpr-signal-unit="Blorbs" />
+    <input id="libmapperSlider4" type="range" min="0" max="100" mpr-signal-name="CoolSlider4" mpr-signal-unit="Blorbs" />
+
+
     <script type="module">
       import { LibmapperDevice, LibmapperSignal } from "./libmapper.js";
 
@@ -22,7 +26,7 @@
       let mySlider = document.getElementById("libmapperSlider");
 
       // Init an outgoing signal
-      let libmapperDev = await LibmapperDevice.create("browserDev");
+      let libmapperDev = await LibmapperDevice.create("browserDev", true);
       let mySig = await libmapperDev.addSignal(mySlider, "OUTGOING");
 
       // Init an incoming signal

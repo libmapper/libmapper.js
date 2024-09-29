@@ -9,7 +9,9 @@ let observer;
  */
 let device;
 
-function main() {
+function autoDiscover(existingDevice) {
+  device = existingDevice; // Associated with existing libmapper device
+
   var elements = document.querySelectorAll("[mpr-signal-name]");
   elements.forEach(registerElement);
 }
@@ -33,4 +35,6 @@ function getType(element) {
   return "INCOMING";
 }
 
-document.addEventListener("DOMContentLoaded", main);
+document.addEventListener("DOMContentLoaded", autoDiscover);
+
+export { autoDiscover };

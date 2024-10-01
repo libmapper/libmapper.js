@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Experiment with libmapper on the web</title>
+  </head>
+  <body>
+    <h1>libmapper on the web</h1>
+    <p>Try adjusting the slider below</p>
+    <hr />
+    <div>
+      <p>Outgoing Signal Value:</p>
+      <input id="libmapperSlider" type="range" min="0" max="100" mpr-signal-name="CoolSlider" mpr-signal-unit="Blorbs" />
+    </div>
+    <hr />
+    <p>Input Signal Value: <span id="inputSigVal">0</span></p>
+    <hr />
+
+    <script src="./libmapper-autodetect.js"></script>
+  </body>
+</html>

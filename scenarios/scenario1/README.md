@@ -7,4 +7,3 @@ This scenario is all about establishing a mapping between a web-based synthesize
 ## Scenario Implementation
 
 To run this scenario, start a web-server in this directory using the command `http-server`.
-

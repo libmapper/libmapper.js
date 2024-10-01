@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Experiment with libmapper on the web</title>
+  </head>
+  <body>
+    <h1>Scenario 2: Web UIs with libmapper</h1>
+
+    <div style="display: flex; flex-direction: column; width: 200px;">
+      <p>Slider 1</p>
+      <input id="slider1" type="range" min="0" max="100" mpr-signal-name="Slider1" mpr-signal-unit="SliderTicks" />
+      <p>Slider 2</p>
+      <input id="slider2" type="range" min="0" max="100" mpr-signal-name="Slider2" mpr-signal-unit="SliderTicks" />
+      <p>Slider 3</p>
+      <input id="slider3" type="range" min="0" max="100" mpr-signal-name="Slider3" mpr-signal-unit="SliderTicks" />
+    </div>
+      
+
+    <script type="module">
+      import { LibmapperDevice, LibmapperSignal } from "./libmapper.js";
+
+      // HTML Element that we will bind a libmapper signal to
+      let mySlider = document.getElementById("libmapperSlider");
+
+      // Init an outgoing signal
+      let libmapperDev = await LibmapperDevice.create("browserDev", true);
+      let mySig = await libmapperDev.addSignal(mySlider, "OUTGOING");
+
+      // Init an incoming signal
+      let span = document.getElementById("inputSigVal");
+      let myIncomingSig = await libmapperDev.addSignal(span, "INCOMING");
+    </script>
+  </body>
+</html>

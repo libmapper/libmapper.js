@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Experiment with libmapper on the web</title>
+  </head>
+  <body>
+    <h1>Scenario 3: Mapping between browser tabs with libmapper</h1>
+
+    <div style="display: flex; flex-direction: column; width: 200px">
+      <p>Input Signal Value</p>
+      <span id="inputSigVal">0</span>
+    </div>
+
+    <script type="module">
+      import { LibmapperDevice, LibmapperSignal } from "./libmapper.js";
+
+      // Init an outgoing signal
+      let libmapperDev = await LibmapperDevice.create("browserDev", true);
+
+      let span = document.getElementById("inputSigVal");
+      let myIncomingSig = await libmapperDev.addSignal(span, "INCOMING");
+    </script>
+  </body>
+</html>
